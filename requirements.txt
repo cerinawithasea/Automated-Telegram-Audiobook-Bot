@@ -1,0 +1,7 @@
+click==8.1.8  # Command-line interface framework
+python-telegram-bot>=20.7  # Telegram Bot API wrapper
+mutagen>=1.47.0  # Audio metadata handling
+python-dotenv>=1.0.0  # Environment variable management
+tqdm==4.67.1  # Progress bars for file operations
+rich>=13.7.0  # Rich terminal output formatting
+watchdog==6.0.0  # File system monitoring
