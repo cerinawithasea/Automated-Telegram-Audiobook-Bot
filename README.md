@@ -176,6 +176,12 @@ If you're using MP3Tag, use these fields:
 - Ensure metadata is UTF-8 encoded
 - Verify tag names match expected format
 
+## Acknowledgments
+
+This project is built upon the work of:
+- [ChannelAutoCaption](https://github.com/samadii/ChannelAutoCaption) by samadii
+- [telegram-upload](https://github.com/Nekmo/telegram-upload) by Nekmo
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
