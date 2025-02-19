@@ -12,12 +12,11 @@ A Python tool that automatically extracts metadata from M4B audiobooks, generate
 - Automatically moves processed files to a separate directory after successful upload
 
 ## Prerequisites
-## Prerequisites
 
-- Python 3.6 or later
+- Python 3.8 or later
 - Telegram account
-- Telegram Bot Token (obtained from @BotFather)
-- API credentials from my.telegram.org
+- API credentials from my.telegram.org (API_ID and API_HASH)
+- Active Telegram group/channel for uploading
 
 ## Installation
 
@@ -34,31 +33,25 @@ pip install -r requirements.txt
 
 ## Configuration
 
-1. Create a Telegram bot:
-- Message @BotFather on Telegram
-- Use /newbot command to create a new bot
-- Save the bot token provided
-
-2. Get your API credentials:
+1. Get your API credentials:
 - Visit https://my.telegram.org/apps
 - Create a new application
 - Save your API_ID and API_HASH
 
-3. Set up environment variables:
-```bash
-export BOT_TOKEN="your_bot_token"
-export API_ID="your_api_id"
-export API_HASH="your_api_hash"
-export TELEGRAM_CHAT_ID="your_chat_id"
-```
+2. Set up your upload channel:
+- Create a Telegram group or channel
+- Note down the group/channel ID (you can use @username_to_id_bot)
+- Ensure you have admin rights in the group/channel
 
-Or create a .env file:
+3. Create a .env file in the project root:
 ```
-BOT_TOKEN=your_bot_token
 API_ID=your_api_id
 API_HASH=your_api_hash
 TELEGRAM_CHAT_ID=your_chat_id
 ```
+
+Note: The chat_id for groups/channels should include the -100 prefix
+(e.g., -1001234567890)
 
 ## Usage
 
@@ -70,22 +63,30 @@ The tool uses the following directory structure:
 
 When running in watch mode, files are automatically moved to the 'processed' subdirectory after successful upload.
 
-1. Generate caption for an audiobook:
+1. Test the uploader setup:
 ```bash
-python main.py caption /path/to/your/audiobook.m4b
+python test_uploader.py /path/to/your/audiobook.m4b
 ```
 
-2. Upload audiobook with caption:
-```bash
-python main.py upload /path/to/your/audiobook.m4b
+2. Upload an audiobook with metadata:
+```python
+from telegram_uploader import TelegramUploader
+
+async def upload_book():
+    uploader = TelegramUploader(
+        api_id="your_api_id",
+        api_hash="your_api_hash"
+    )
+    
+    await uploader.upload_audio(
+        file_path="/path/to/audiobook.m4b",
+        chat_id="your_chat_id",
+        title="Book Title",
+        performer="Author Name"
+    )
 ```
 
-3. Test the setup:
-```bash
-python main.py test
-```
-
-4. Watch directory for new audiobooks:
+3. Watch directory for new audiobooks:
 ```bash
 python main.py watch /path/to/watch/directory
 ```
@@ -136,10 +137,11 @@ If you're using MP3Tag, use these fields:
 
 ## Troubleshooting
 
-1. **Bot not responding**:
-- Verify your BOT_TOKEN is correct
-- Ensure you've started a chat with your bot
-- Check if the bot has proper permissions
+1. **Upload Errors**:
+- Ensure your API credentials are correct
+- Check your internet connection
+- Verify group/channel permissions
+- Double-check the chat_id format (should include -100 prefix)
 
 2. **Metadata not showing**:
 - Verify your audiobook has proper metadata tags
@@ -166,15 +168,22 @@ If you're using MP3Tag, use these fields:
 - Use MP3Tag to add metadata before uploading
 - Required fields: Title, Author, Narrator
 
-3. **Bot initialization fails**
-- Double-check your API_ID and API_HASH
-- Ensure BOT_TOKEN is valid and bot is active
-- Try restarting your bot in @BotFather
+3. **Authentication Issues**:
+- Verify API_ID and API_HASH are correct
+- Check your .env file configuration
+- Ensure you have proper permissions in the group/channel
+- Try clearing the session file and re-authenticating
 
-4. **Caption formatting issues**
+4. **Caption formatting issues**:
 - Check for special characters in metadata
 - Ensure metadata is UTF-8 encoded
 - Verify tag names match expected format
+
+5. **Large File Uploads**:
+- Supported up to 2GB file size
+- Progress bar shows upload status
+- ETA and speed information provided
+- Automatic retry on network errors
 
 ## Acknowledgments
 

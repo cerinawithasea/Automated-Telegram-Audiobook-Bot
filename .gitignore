@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+build/
 develop-eggs/
 dist/
 downloads/
@@ -25,8 +26,18 @@ env/
 ENV/
 .env
 .venv
+.python-version
 
-# IDE
+# Test files and data
+*.bin
+test_*.mp3
+test_*.m4b
+*_test.*
+test_data/
+test_files/
+test_uploads/
+
+# IDE and Editors
 .idea/
 .vscode/
 *.swp
@@ -36,11 +47,18 @@ ENV/
 .settings/
 *.sublime-workspace
 *.sublime-project
+.vs/
+*~
+*.iml
 
-# Logs
+# Logs and databases
 *.log
 logs/
 log/
+*.sqlite
+*.db
+db.sqlite3
+db.sqlite3-journal
 
 # Local development
 .env.local
@@ -48,14 +66,20 @@ log/
 .env.test
 .env.production
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
+
+# Backups and temporary files
+*.bak
+*.tmp
+*.temp
+*.swp
+*~
 
 # System files
 .DS_Store
 Thumbs.db
 desktop.ini
-*.bak
-*.tmp
-*.swp
+.directory
 
+# Session files
+*.session
+*.session-journal

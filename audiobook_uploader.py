@@ -121,16 +121,18 @@ async def main():
         uploader = TelegramUploader(
             bot_token=bot_token
         )
-        success = await uploader.upload_audio(
-            file_path=file_path,
-            caption=caption,
-            progress_callback=progress_callback,
-            chat_id=os.getenv('TELEGRAM_CHAT_ID')
-        )
+        success = False
+        try:
+            success = await uploader.upload_audio(
+                file_path=file_path,
+                caption=caption,
+                progress_callback=progress_callback,
+                chat_id=os.getenv('TELEGRAM_CHAT_ID')
+            )
         except Exception as e:
             logger.error(f"Upload failed: {str(e)}")
             return False
-        
+
         if success:
             logger.info(f"Successfully uploaded: {os.path.basename(file_path)}")
             

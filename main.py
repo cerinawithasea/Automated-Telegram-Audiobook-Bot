@@ -10,7 +10,8 @@ import time
 from pathlib import Path
 from dotenv import load_dotenv
 from metadata import AudiobookMetadata
-from telegram import Bot, InputFile
+from telegram import Bot
+from telegram_uploader import TelegramUploader
 from tqdm import tqdm
 
 # Maximum file size (4GB for Telegram Premium)
@@ -42,23 +43,42 @@ def validate_env():
 
 
 async def upload_to_telegram(bot: Bot, file_path: str, caption: str):
-    """Upload a file to Telegram."""
+    """Upload a file to Telegram with progress tracking."""
     try:
         file_size = Path(file_path).stat().st_size
         if file_size > MAX_FILE_SIZE:
             raise click.ClickException(f"File size {file_size/1024/1024/1024:.2f}GB exceeds Telegram's 4GB limit")
 
-        with open(file_path, 'rb') as f:
-            input_file = InputFile(f, filename=os.path.basename(file_path))
-            await bot.send_document(
+        uploader = TelegramUploader(bot=bot)
+        progress_bar = tqdm(
+            total=file_size,
+            unit='B',
+            unit_scale=True,
+            desc=f"Uploading {os.path.basename(file_path)}",
+            dynamic_ncols=True
+        )
+
+        async def progress_callback(current, total, filename, chat_id, speed, percentage, eta):
+            progress_bar.n = current
+            progress_bar.set_postfix({
+                'Speed': f"{speed/1024/1024:.2f}MB/s",
+                'ETA': eta,
+                'Progress': f"{percentage:.1f}%"
+            }, refresh=True)
+            progress_bar.refresh()
+
+        try:
+            await uploader.upload_file(
+                file_path=file_path,
                 chat_id=os.getenv('TELEGRAM_CHAT_ID'),
-                document=input_file,
                 caption=caption,
-                write_timeout=1200,  # 20 minutes timeout for large files
-                read_timeout=1200,   # 20 minutes read timeout
-                connect_timeout=60,  # 1 minute connect timeout
+                progress_callback=progress_callback
             )
-        return True  # Indicate successful upload
+            progress_bar.close()
+            return True  # Indicate successful upload
+        except Exception as e:
+            progress_bar.close()
+            raise e
     except Exception as e:
         logger.error(f"Error uploading file: {str(e)}\nFull error: {repr(e)}")
         raise click.ClickException(f"Upload failed: {str(e)}")
